@@ -40,6 +40,8 @@ public class AppConfig {
     private String loginPageUri;
     private String authorizer;
     private SessionConfig sessionManagement = new SessionConfig();
+    private String logoutPageUri;
+    private String authenticator;
     private Map<String, String> errorPages = Collections.emptyMap();
     private List<Menu> menus = Collections.emptyList();
     private SecurityConfig security = new SecurityConfig();
@@ -100,6 +102,24 @@ public class AppConfig {
     }
 
     /**
+     * Returns the logout page URI in this app's config.
+     *
+     * @return URI of the logout page in this app's config
+     */
+    public String getLogoutPageUri() {
+        return logoutPageUri;
+    }
+
+    /**
+     * Sets the logout page URI in this app's config.
+     *
+     * @param logoutPageUri URI of the logout page to be set
+     */
+    public void setLogoutPageUri(String logoutPageUri) {
+        this.logoutPageUri = logoutPageUri;
+    }
+
+    /**
      * Returns the authorizer in this app's config.
      *
      * @return authorizer in this app's config
@@ -133,6 +153,24 @@ public class AppConfig {
      */
     public void setSessionManagement(SessionConfig sessionManagement) {
         this.sessionManagement = (sessionManagement == null) ? new SessionConfig() : sessionManagement;
+    }
+
+    /**
+     * Returns the authenticator in this app's config.
+     *
+     * @return authenticator in this app's config
+     */
+    public String getAuthenticator() {
+        return authenticator;
+    }
+
+    /**
+     * Sets the authenticator in this app's config.
+     *
+     * @param authenticator authenticator in this app's config
+     */
+    public void setAuthenticator(String authenticator) {
+        this.authenticator = authenticator;
     }
 
     /**

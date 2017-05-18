@@ -65,6 +65,16 @@ public class ConfigurationTest {
     }
 
     @Test
+    public void testLogoutPageUriValidation() {
+        Configuration configuration = createConfiguration();
+        Assert.assertThrows(IllegalArgumentException.class, () -> configuration.setLogoutPageUri(""));
+        Assert.assertThrows(IllegalArgumentException.class, () -> configuration.setLogoutPageUri("a/bc"));
+
+        configuration.setLogoutPageUri(null);
+        configuration.setLogoutPageUri("/simple-auth/logout");
+    }
+
+    @Test
     public void testAuthorizerValidations() {
         Configuration configuration = createConfiguration();
 
@@ -98,6 +108,18 @@ public class ConfigurationTest {
         Assert.assertEquals(0L, configuration.getSessionTimeout());
         Assert.assertThrows(IllegalArgumentException.class, () -> configuration.setSessionTimeout(-1));
         configuration.setSessionTimeout(0);
+    }
+
+    @Test
+    public void testAuthenticatorValidations() {
+        Configuration configuration = createConfiguration();
+
+        Assert.assertThrows(IllegalArgumentException.class, () -> configuration.setAuthenticator(""));
+        Assert.assertThrows(IllegalArgumentException.class, () -> configuration.setAuthenticator("c/lass"));
+        Assert.assertThrows(IllegalArgumentException.class, () -> configuration.setAuthenticator("c*lass"));
+        configuration.setAuthenticator(null);
+        configuration.setAuthenticator("FormParamAuthenticator");
+        configuration.setAuthenticator("org.wso2.carbon.uuf.sample.simpleauth.bundle.api.auth.FormParamAuthenticator");
     }
 
     @Test

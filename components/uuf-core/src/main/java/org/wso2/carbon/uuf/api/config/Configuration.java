@@ -49,9 +49,11 @@ public class Configuration {
     private String contextPath;
     private String themeName;
     private String loginPageUri;
+    private String logoutPageUri;
     private String authorizer;
     private String sessionManagerFactoryClassName;
     private long sessionTimeout;
+    private String authenticator;
     private Map<Integer, String> errorPageUris;
     private String defaultErrorPageUri;
     private ListMultimap<String, MenuItem> menus;
@@ -143,6 +145,32 @@ public class Configuration {
     }
 
     /**
+     * Returns the configured logout page URI (without the app context path) for the app.
+     *
+     * @return logout page's URI
+     */
+    public Optional<String> getLogoutPageUri() {
+        return Optional.ofNullable(logoutPageUri);
+    }
+
+    /**
+     * Sets the URI of the logout page for the app.
+     *
+     * @param logoutPageUri URI of the logout page to be set
+     */
+    public void setLogoutPageUri(String logoutPageUri) {
+        if (logoutPageUri != null) {
+            if (logoutPageUri.isEmpty()) {
+                throw new IllegalArgumentException("Logout page URI cannot be empty.");
+            } else if (logoutPageUri.charAt(0) != '/') {
+                throw new IllegalArgumentException("Logout page URI must start with a '/'. Instead found '" +
+                        logoutPageUri.charAt(0) + "' at the beginning.");
+            }
+        }
+        this.logoutPageUri = logoutPageUri;
+    }
+
+    /**
      * Returns the authorizer class name for the app.
      *
      * @return authorizer class name
@@ -215,6 +243,33 @@ public class Configuration {
             throw new IllegalArgumentException("Session timeout should not be a negative value.");
         }
         this.sessionTimeout = sessionTimeout;
+    }
+
+    /**
+     * Returns the authenticator class name for the app.
+     *
+     * @return authenticator implementation class
+     */
+    public Optional<String> getAuthenticator() {
+        return Optional.ofNullable(authenticator);
+    }
+
+    /**
+     * Sets the authenticator class name for the app.
+     *
+     * @param authenticator authenticator implementation class
+     */
+    public void setAuthenticator(String authenticator) {
+        if (authenticator != null) {
+            if (authenticator.isEmpty()) {
+                throw new IllegalArgumentException("Authenticator cannot be empty.");
+            }
+            if (!FULLY_QUALIFIED_CLASS_NAME_PATTERN.matcher(authenticator).matches()) {
+                throw new IllegalArgumentException("Authenticator class name is invalid and do not " +
+                        "comprehend to be a fully qualified java class name.");
+            }
+        }
+        this.authenticator = authenticator;
     }
 
     /**

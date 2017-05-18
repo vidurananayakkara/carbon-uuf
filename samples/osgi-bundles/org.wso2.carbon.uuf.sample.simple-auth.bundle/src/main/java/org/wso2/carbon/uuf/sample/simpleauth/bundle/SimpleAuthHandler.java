@@ -37,16 +37,6 @@ import javax.security.auth.login.LoginException;
 )
 public class SimpleAuthHandler {
 
-    @Activate
-    public void activate(BundleContext bundleContext) {
-        // This config property will be read by Carbon-Security-Component only once at @Activate.
-        // Hence need to set before activating Carbon-Security-Component.
-        //TODO: Check once carbon-security component is adapted Startup-Order-Resolver
-        System.setProperty("java.security.auth.login.config",
-                           Utils.getCarbonConfigHome().resolve("security").resolve("carbon-jaas.config").toString()
-        );
-    }
-
     /**
      * Authenticate a user with this user name and password.
      *
@@ -66,5 +56,15 @@ public class SimpleAuthHandler {
         LoginContext loginContext = new LoginContext("CarbonSecurityConfig", callbackHandler);
         loginContext.login();
         return new User(userName, Collections.emptyMap());
+    }
+
+    @Activate
+    public void activate(BundleContext bundleContext) {
+        // This config property will be read by Carbon-Security-Component only once at @Activate.
+        // Hence need to set before activating Carbon-Security-Component.
+        //TODO: Check once carbon-security component is adapted Startup-Order-Resolver
+        System.setProperty("java.security.auth.login.config",
+                           Utils.getCarbonConfigHome().resolve("security").resolve("carbon-jaas.config").toString()
+        );
     }
 }
