@@ -96,8 +96,6 @@ public interface Authenticator {
      */
     class AuthenticatorResult {
 
-        public static final String LOGIN_REDIRECT_URI = "loginRedirectUri";
-
         private final AuthenticatorStatus status;
         private final String redirectURL;
         private final AuthenticationException exception;

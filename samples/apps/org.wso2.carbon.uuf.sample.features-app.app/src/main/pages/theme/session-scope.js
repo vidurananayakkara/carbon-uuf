@@ -18,8 +18,8 @@
 function onGet(env) {
     var session = getSession();
     if (!session) {
-        var SimpleAuthHandler = Java.type("org.wso2.carbon.uuf.sample.simpleauth.bundle.SimpleAuthHandler");
-        var user = SimpleAuthHandler.authenticate("admin", "admin");
+        var User = Java.type("org.wso2.carbon.uuf.api.auth.User");
+        var user = new User("admin", null);
         session = createSession(user);
     }
     session.setThemeName("org.wso2.carbon.uuf.sample.green.theme");

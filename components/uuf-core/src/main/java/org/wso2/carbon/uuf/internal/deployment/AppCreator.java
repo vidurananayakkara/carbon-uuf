@@ -51,6 +51,7 @@ import org.wso2.carbon.uuf.internal.exception.AppCreationException;
 import org.wso2.carbon.uuf.internal.exception.ConfigurationException;
 import org.wso2.carbon.uuf.internal.util.NameUtils;
 import org.wso2.carbon.uuf.spi.RenderableCreator;
+import org.wso2.carbon.uuf.spi.auth.Authenticator;
 import org.wso2.carbon.uuf.spi.auth.Authorizer;
 import org.wso2.carbon.uuf.spi.auth.SessionManager;
 import org.wso2.carbon.uuf.spi.auth.SessionManagerFactory;
@@ -141,9 +142,18 @@ public class AppCreator {
             LOGGER.warn("No authorizer is configured for '{}' app.", appName);
         }
 
+        // Get Authenticator
+        Authenticator authenticator = configuration.getAuthenticator()
+                .map(authenticatorClass -> pluginProvider.getPluginInstance(Authenticator.class, authenticatorClass,
+                        this.getClass().getClassLoader()))
+                .orElse(null);
+        if (authenticator == null) {
+            LOGGER.warn("No authenticator is configured for '{}' app.", appName);
+        }
+
         // Create App.
         return new App(appName, appContextPath, new HashSet<>(createdComponents.values()), themes, configuration,
-                       bindings, i18nResources, sessionManager, authorizer);
+                       bindings, i18nResources, sessionManager, authorizer, authenticator);
     }
 
     private Configuration createConfiguration(AppReference appReference) {
@@ -152,7 +162,6 @@ public class AppCreator {
         configuration.setContextPath(appConfig.getContextPath());
         configuration.setThemeName(appConfig.getTheme());
         configuration.setLoginPageUri(appConfig.getLoginPageUri());
-        configuration.setLogoutPageUri(appConfig.getLogoutPageUri());
         configuration.setAuthorizer(appConfig.getAuthorizer());
         configuration.setSessionManagerFactoryClassName(appConfig.getSessionManagement().getFactoryClassName());
         configuration.setSessionTimeout(appConfig.getSessionManagement().getTimeout());

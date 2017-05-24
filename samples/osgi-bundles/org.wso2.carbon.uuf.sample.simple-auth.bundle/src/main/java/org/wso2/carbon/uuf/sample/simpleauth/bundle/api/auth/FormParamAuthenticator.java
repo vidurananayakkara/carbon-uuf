@@ -48,47 +48,56 @@ import javax.security.auth.login.LoginException;
            service = Authenticator.class, immediate = true)
 public class FormParamAuthenticator implements Authenticator {
 
+    public static final String LOGIN_REDIRECT_URI = "loginRedirectUri";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String AUTHORIZATION = "Authorization";
-    private static final String BASIC = "Basic";
+    private static final String BASIC = "Basic ";
     private static final String CARBON_SECURITY_CONFIG = "CarbonSecurityConfig";
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Upon success authentication the user will be re-directed to 'loginRedirectUri' URI specified in the relevant
+     * <tt>component.yaml</tt> configuration. If this value is not specified in <tt>component.yaml</tt> configuration
+     * then the user will be re-directed to the app context path.
      */
     @Override
     public AuthenticatorResult login(HttpRequest request, HttpResponse response, SessionManager sessionManager,
                                      Configuration configuration) throws AuthenticationException {
         if (request.isGetRequest()) {
-            return new AuthenticatorResult(AuthenticatorStatus.CONTINUE, null,
-                                           new AuthenticationException("Request is not a HTTP POST request"), null);
+            return new AuthenticatorResult(AuthenticatorStatus.CONTINUE, null, null, null);
         }
 
         Object userName = request.getFormParams().get(USERNAME);
         Object password = request.getFormParams().get(PASSWORD);
 
         if (userName == null || password == null) {
-            return new AuthenticatorResult(AuthenticatorStatus.ERROR, null,
-                                           new AuthenticationException("Username or password field is empty"), null);
+            AuthenticationException exception = new AuthenticationException("Username or password field is empty");
+            String loginPageUri = configuration.getLoginPageUri().orElseThrow(() -> exception);
+            return new AuthenticatorResult(AuthenticatorStatus.ERROR, loginPageUri, exception, null);
         }
 
         PrivilegedCarbonContext.destroyCurrentContext();
         CarbonMessage carbonMessage = new DefaultCarbonMessage();
         carbonMessage.setHeader(AUTHORIZATION, BASIC + Base64.getEncoder()
-                .encodeToString((userName.toString() + ":" + password.toString()).getBytes()));
+                .encodeToString((userName + ":" + password).getBytes()));
+
         ProxyCallbackHandler callbackHandler = new ProxyCallbackHandler(carbonMessage);
         try {
             LoginContext loginContext = new LoginContext(CARBON_SECURITY_CONFIG, callbackHandler);
             loginContext.login();
         } catch (LoginException e) {
-            return new AuthenticatorResult(AuthenticatorStatus.ERROR, null,
-                                           new AuthenticationException("Login using login context failed", e), null);
+            AuthenticationException exception = new AuthenticationException("Login using login context failed", e);
+            String loginPageUri = configuration.getLoginPageUri().orElseThrow(() -> exception);
+            return new AuthenticatorResult(AuthenticatorStatus.ERROR, loginPageUri, exception, null);
         }
 
         User user = new User(userName.toString(), Collections.emptyMap());
         sessionManager.createSession(user, request, response);
-        return new AuthenticatorResult(AuthenticatorStatus.SUCCESS, null, null, user);
+        // "loginRedirectUri" value can be configured in the relevant 'component.yaml' configuration.
+        String loginRedirectUri = configuration.other().getOrDefault(LOGIN_REDIRECT_URI, "/").toString();
+        return new AuthenticatorResult(AuthenticatorStatus.SUCCESS, loginRedirectUri, null, user);
     }
 
     /**
@@ -99,6 +108,6 @@ public class FormParamAuthenticator implements Authenticator {
                                       Configuration configuration) throws AuthenticationException {
         sessionManager.destroySession(request, response);
         return new AuthenticatorResult(AuthenticatorStatus.SUCCESS, request.getContextPath() + configuration.other()
-                .get(AuthenticatorResult.LOGIN_REDIRECT_URI).toString(), null, null);
+                .get(LOGIN_REDIRECT_URI).toString(), null, null);
     }
 }

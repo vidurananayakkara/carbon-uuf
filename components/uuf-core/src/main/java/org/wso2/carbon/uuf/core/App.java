@@ -25,6 +25,7 @@ import org.wso2.carbon.uuf.api.config.Bindings;
 import org.wso2.carbon.uuf.api.config.Configuration;
 import org.wso2.carbon.uuf.api.config.I18nResources;
 import org.wso2.carbon.uuf.api.model.MapModel;
+import org.wso2.carbon.uuf.exception.AuthenticationException;
 import org.wso2.carbon.uuf.exception.FragmentNotFoundException;
 import org.wso2.carbon.uuf.exception.HttpErrorException;
 import org.wso2.carbon.uuf.exception.PageNotFoundException;
@@ -35,6 +36,7 @@ import org.wso2.carbon.uuf.internal.util.NameUtils;
 import org.wso2.carbon.uuf.internal.util.UriUtils;
 import org.wso2.carbon.uuf.spi.HttpRequest;
 import org.wso2.carbon.uuf.spi.HttpResponse;
+import org.wso2.carbon.uuf.spi.auth.Authenticator;
 import org.wso2.carbon.uuf.spi.auth.Authorizer;
 import org.wso2.carbon.uuf.spi.auth.SessionManager;
 import org.wso2.carbon.uuf.spi.model.Model;
@@ -57,11 +59,12 @@ public class App {
     private final Theme defaultTheme;
     private final SessionManager sessionManager;
     private final Authorizer authorizer;
+    private final Authenticator authenticator;
     private final Configuration configuration;
 
     public App(String name, String contextPath, Set<Component> components, Set<Theme> themes,
                Configuration configuration, Bindings bindings, I18nResources i18nResources,
-               SessionManager sessionManager, Authorizer authorizer) {
+               SessionManager sessionManager, Authorizer authorizer, Authenticator authenticator) {
         this.name = name;
         this.contextPath = contextPath;
 
@@ -84,6 +87,7 @@ public class App {
         this.configuration = configuration;
         this.sessionManager = sessionManager;
         this.authorizer = authorizer;
+        this.authenticator = authenticator;
     }
 
     public String getName() {

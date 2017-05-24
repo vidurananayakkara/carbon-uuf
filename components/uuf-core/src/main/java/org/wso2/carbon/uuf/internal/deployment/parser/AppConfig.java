@@ -40,7 +40,6 @@ public class AppConfig {
     private String loginPageUri;
     private String authorizer;
     private SessionConfig sessionManagement = new SessionConfig();
-    private String logoutPageUri;
     private String authenticator;
     private Map<String, String> errorPages = Collections.emptyMap();
     private List<Menu> menus = Collections.emptyList();
@@ -99,24 +98,6 @@ public class AppConfig {
      */
     public void setLoginPageUri(String loginPageUri) {
         this.loginPageUri = loginPageUri;
-    }
-
-    /**
-     * Returns the logout page URI in this app's config.
-     *
-     * @return URI of the logout page in this app's config
-     */
-    public String getLogoutPageUri() {
-        return logoutPageUri;
-    }
-
-    /**
-     * Sets the logout page URI in this app's config.
-     *
-     * @param logoutPageUri URI of the logout page to be set
-     */
-    public void setLogoutPageUri(String logoutPageUri) {
-        this.logoutPageUri = logoutPageUri;
     }
 
     /**

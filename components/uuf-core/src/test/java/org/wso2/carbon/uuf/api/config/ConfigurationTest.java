@@ -65,16 +65,6 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void testLogoutPageUriValidation() {
-        Configuration configuration = createConfiguration();
-        Assert.assertThrows(IllegalArgumentException.class, () -> configuration.setLogoutPageUri(""));
-        Assert.assertThrows(IllegalArgumentException.class, () -> configuration.setLogoutPageUri("a/bc"));
-
-        configuration.setLogoutPageUri(null);
-        configuration.setLogoutPageUri("/simple-auth/logout");
-    }
-
-    @Test
     public void testAuthorizerValidations() {
         Configuration configuration = createConfiguration();
 

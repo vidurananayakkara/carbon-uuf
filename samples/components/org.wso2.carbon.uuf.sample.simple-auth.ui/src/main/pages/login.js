@@ -15,31 +15,5 @@
  */
 
 function onPost(env) {
-    var session = getSession();
-    if (session) {
-        sendRedirect(env.contextPath + env.config['loginRedirectUri']);
-    }
 
-    var username = env.request.formParams['username'];
-    var password = env.request.formParams['password'];
-    // calling dummy authentication service
-    var result = authenticate(username, password);
-    if (result.success) {
-        //configure login redirect uri
-        sendRedirect(env.contextPath + env.config['loginRedirectUri']);
-    } else {
-        return {errorMessage: result.message};
-    }
-}
-
-function authenticate(username, password) {
-    try {
-        // Calling dummy osgi authentication service
-        var SimpleAuthHandler = Java.type("org.wso2.carbon.uuf.sample.simpleauth.bundle.SimpleAuthHandler");
-        var user = SimpleAuthHandler.authenticate(username, password);
-        createSession(user);
-        return {success: true, message: "success"}
-    } catch (e) {
-        return {success: false, message: e.message};
-    }
 }

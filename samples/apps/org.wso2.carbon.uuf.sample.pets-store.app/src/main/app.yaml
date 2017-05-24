@@ -3,6 +3,9 @@
 # Default theme for this app.
 theme : "org.wso2.carbon.uuf.sample.default.theme"
 
+# Authenticator for this app
+authenticator: "org.wso2.carbon.uuf.sample.simpleauth.bundle.api.auth.FormParamAuthenticator"
+
 # Session manager configuration for this app
 sessionManagement:
   factoryClassName: "org.wso2.carbon.uuf.sample.simpleauth.bundle.api.auth.PersistentSessionManagerFactory"
@@ -38,9 +41,6 @@ errorPages:
 
 # URI of the login page in this app.
 loginPageUri: "/simple-auth/login"
-
-# URI of the logout page in this app.
-logoutPageUri: "/simple-auth/logout"
 
 # Security related configurations for this app.
 security:

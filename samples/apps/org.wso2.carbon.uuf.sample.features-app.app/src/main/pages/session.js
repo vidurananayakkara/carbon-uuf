@@ -18,13 +18,9 @@
 function onGet(env) {
     var session = getSession();
     if (!session) {
-        var user = login("admin", "admin"); // call some login function
+        var User = Java.type("org.wso2.carbon.uuf.api.auth.User");
+        var user = new User("admin", null);
         session = createSession(user);
     }
     return {"id": session.getUser().getId()};
-}
-
-function login(username, password) {
-    var SimpleAuthHandler = Java.type("org.wso2.carbon.uuf.sample.simpleauth.bundle.SimpleAuthHandler");
-    return SimpleAuthHandler.authenticate(username, password);
 }

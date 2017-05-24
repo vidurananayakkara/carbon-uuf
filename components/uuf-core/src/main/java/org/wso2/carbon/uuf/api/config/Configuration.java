@@ -49,7 +49,6 @@ public class Configuration {
     private String contextPath;
     private String themeName;
     private String loginPageUri;
-    private String logoutPageUri;
     private String authorizer;
     private String sessionManagerFactoryClassName;
     private long sessionTimeout;
@@ -142,32 +141,6 @@ public class Configuration {
             }
         }
         this.loginPageUri = loginPageUri;
-    }
-
-    /**
-     * Returns the configured logout page URI (without the app context path) for the app.
-     *
-     * @return logout page's URI
-     */
-    public Optional<String> getLogoutPageUri() {
-        return Optional.ofNullable(logoutPageUri);
-    }
-
-    /**
-     * Sets the URI of the logout page for the app.
-     *
-     * @param logoutPageUri URI of the logout page to be set
-     */
-    public void setLogoutPageUri(String logoutPageUri) {
-        if (logoutPageUri != null) {
-            if (logoutPageUri.isEmpty()) {
-                throw new IllegalArgumentException("Logout page URI cannot be empty.");
-            } else if (logoutPageUri.charAt(0) != '/') {
-                throw new IllegalArgumentException("Logout page URI must start with a '/'. Instead found '" +
-                        logoutPageUri.charAt(0) + "' at the beginning.");
-            }
-        }
-        this.logoutPageUri = logoutPageUri;
     }
 
     /**
