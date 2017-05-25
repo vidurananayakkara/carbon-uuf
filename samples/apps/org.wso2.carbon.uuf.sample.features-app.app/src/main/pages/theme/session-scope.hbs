@@ -9,13 +9,16 @@
     <pre>
         var session = getSession();
         if (!session) {
-            session = createSession("admin");
+            var User = Java.type("org.wso2.carbon.uuf.api.auth.User");
+            var user = new User("admin", null);
+            createSession(user);
         }
         session.setThemeName("org.wso2.carbon.uuf.sample.theme.green");
     </pre>
     <br />
     <h3>Notes:</h3>
     <ul>
+        <!-- TODO: Page refresh should not be a requirement for applying the theme -->
         <li>
             Changing theme through the server-side Js will be affected from the next HTTP request.
             To view changed theme; please refresh this page.
