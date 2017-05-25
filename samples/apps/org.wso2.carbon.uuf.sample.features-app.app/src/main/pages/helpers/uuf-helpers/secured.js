@@ -15,17 +15,10 @@
  */
 
 function onGet(env) {
-    var executeSamples = env.request.queryParams["executeSamples"];
-    if (executeSamples) {
-        var session = getSession();
-        if (session) {
-            return;
-        }
+    var session = getSession();
+    if (!session) {
         var User = Java.type("org.wso2.carbon.uuf.api.auth.User");
         var user = new User("admin", null);
         createSession(user);
-        sendRedirect(env.contextPath + "/helpers/uuf-helpers/secured?executeSamples=true");
-    } else {
-        destroySession();
     }
 }
