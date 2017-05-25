@@ -19,12 +19,12 @@
 package org.wso2.carbon.uuf.sample.simpleauth.bundle.api.auth;
 
 import org.wso2.carbon.uuf.api.auth.Session;
+import org.wso2.carbon.uuf.api.auth.User;
 import org.wso2.carbon.uuf.api.config.Configuration;
 import org.wso2.carbon.uuf.exception.SessionManagementException;
 import org.wso2.carbon.uuf.spi.HttpRequest;
 import org.wso2.carbon.uuf.spi.HttpResponse;
 import org.wso2.carbon.uuf.spi.auth.SessionManager;
-import org.wso2.carbon.uuf.api.auth.User;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -113,16 +113,15 @@ public class PersistentSessionManager implements SessionManager {
     @Override
     public Optional<Session> getSession(HttpRequest request, HttpResponse response) throws SessionManagementException {
         String sessionId = request.getCookieValue(COOKIE_SESSION_ID);
-        if (sessionId == null) {
-            return Optional.empty();
-        }
-        if (!Session.isValidSessionId(sessionId)) {
-            throw new SessionManagementException("Session ID '" + sessionId + "' is invalid.");
+        if(!isSessionAvailable(sessionId)){
+            // Session is not available in the request. May be the session is created but the browser is not updated.
+            String cookie = response.getCookie(COOKIE_SESSION_ID);
+            sessionId = cookie == null ? null : cookie.split(";")[0];
+            if(!isSessionAvailable(sessionId)){
+                return Optional.empty();
+            }
         }
         File sessionFile = Paths.get(tempDirectory.toString(), sessionId).toFile();
-        if (!sessionFile.exists()) {
-            return Optional.empty();
-        }
         try (FileInputStream fis = new FileInputStream(sessionFile);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             Session session = (Session) ois.readObject();
@@ -165,6 +164,23 @@ public class PersistentSessionManager implements SessionManager {
         response.addCookie(COOKIE_SESSION_ID, expiredCookie);
         response.addCookie(COOKIE_CSRF_TOKEN, expiredCookie);
         return deleted;
+    }
+
+    /**
+     * Returns whether the session for the session id exists.
+     *
+     * @param sessionId session id of the session
+     * @return {@code true} if the session exists, {@code false} otherwise
+     */
+    private boolean isSessionAvailable(String sessionId) {
+        if (sessionId == null) {
+            return false;
+        }
+        if (!Session.isValidSessionId(sessionId)) {
+            return false;
+        }
+        File sessionFile = Paths.get(tempDirectory.toString(), sessionId).toFile();
+        return sessionFile.exists();
     }
 
     /**

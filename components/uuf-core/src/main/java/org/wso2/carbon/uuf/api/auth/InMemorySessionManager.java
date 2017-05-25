@@ -84,13 +84,14 @@ public class InMemorySessionManager implements SessionManager {
     public Optional<Session> getSession(HttpRequest request, HttpResponse response)
             throws SessionManagementException {
         String sessionId = request.getCookieValue(COOKIE_SESSION_ID);
-        if (sessionId == null) {
-            return Optional.empty();
+        Optional<Session> session = getSessionFromId(sessionId);
+        if (!session.isPresent()) {
+            // Session is not available in the request. May be the session is created but the browser is not updated.
+            String cookie = response.getCookie(COOKIE_SESSION_ID);
+            sessionId = cookie == null ? null : cookie.split(";")[0];
+            session = getSessionFromId(sessionId);
         }
-        if (!Session.isValidSessionId(sessionId)) {
-            throw new SessionManagementException("Session ID '" + sessionId + "' is invalid.");
-        }
-        return Optional.ofNullable(cache.get(sessionId));
+        return session;
     }
 
     /**
@@ -121,6 +122,19 @@ public class InMemorySessionManager implements SessionManager {
     @Override
     public int getCount() {
         return Iterables.size(cache);
+    }
+
+    /**
+     * Returns the session for the session id.
+     *
+     * @param sessionId session id of the session
+     * @return session for the session id
+     */
+    private Optional<Session> getSessionFromId(String sessionId) {
+        if (sessionId == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(cache.get(sessionId));
     }
 
     /**
